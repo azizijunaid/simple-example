@@ -8,48 +8,69 @@ var port = (process.env.PORT || 7000);
 
 app.use(bodyParser.json())
 
+var dbUrl = mongoose.connect('mongodb://mani:mani@ds153179.mlab.com:53179/example');
 
 //////////////schema and model///////////////////////////////////////////
-var studentSchema = new mongoose.Schema({
-    email: String,
-    name: String
+var signUpSchema = new mongoose.Schema({
+    email: { type: String, required: true, unique: true },
+    name: String,
+    pass: Number,
+    address: String,
+    time: { type: Date, default: Date.now }
 });
-var studentModel = mongoose.model("student", studentSchema);
+var userModel = mongoose.model("user", signUpSchema);
 //////////////schema and model//////////////////////////////////////////
 
 
-app.post("/add", function (req, res, next) {
-
-    console.log("body is: ", req.body);
-
-    var newStudent = new studentModel({
+app.post("/signup", function (req, res, next) {
+    var newUser = new userModel({
         email: req.body.email,
         name: req.body.name,
+        pass: req.body.pass,
+        address: req.body.address
     })
-
-    newStudent.save(function (err, data) {
+    newUser.save(function (err, data) {
         if (!err) {
-            console.log("student is saved");
+            console.log("student is saved" + data);
             res.send("student is saved");
         } else {
-            res.send("student saving failed", err);
-            console.log("student saving failed", err);
+            res.send("student saving failed");
+            console.log("student saving failed" + err);
         }
     });
 });
 
 
+app.get("/user", function (req, res, next) {
+    userModel.find({address : "karachi",name: "majid"}, function (err, data) {
+        if (err) {
+            console.log("Error" + err )
+            res.send(err)
+        }
+        else {
+            console.log("Data" + data )            
+            res.send(data)
+        }
+    })
+});
 
-app.get("/", function (req, res, next) {
-    console.log("reauest is comming to '/' ");
-    res.send("Hello world");
+
+app.delete("/user", function (req, res, next) {
+    userModel.remove({address : "karachi",name: "majid"}, function (err, data) {
+        if (err) {
+            console.log("Error" + err )
+            res.send(err)
+        }
+        else {
+            console.log("Data" + data )            
+            res.send(data)
+        }
+    })
 });
 
 app.listen(port, function () {
     console.log('app is running on port', port);
 });
-
-mongoose.connect("mongodb://addmin:addmin@ds059185.mongolab.com:59185/salesmanapp");
 
 mongoose.connection.on('connected', function () {
     console.log("Mongoose is connected");

@@ -6,7 +6,7 @@ var bodyParser = require("body-parser");
 var app = express();
 var port = (process.env.PORT || 7000);
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 var dbUrl = mongoose.connect('mongodb://mani:mani@ds153179.mlab.com:53179/example');
 
